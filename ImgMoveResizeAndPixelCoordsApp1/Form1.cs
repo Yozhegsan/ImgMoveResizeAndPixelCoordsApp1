@@ -24,20 +24,22 @@ namespace ImgMoveResizeAndPixelCoordsApp1
 
         Point mPos = new Point();
         Point pPos = new Point();
+        Point ClickTestBeginPos = new Point();
+
+
+        int CurEQ = -1;
+
         //###############################################################################################################
 
         public Form1() { InitializeComponent(); }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //pic.Bounds = ClientRectangle;
             pic.Image = res.KKZ_2_25p_work;
-
             bmp = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
             g = Graphics.FromImage(bmp);
-
-            LoadEqList();
-
+            ReLoadEqList();
+            Form1_Resize(null, null);
         }
 
         private void pic_MouseDown(object sender, MouseEventArgs e)
@@ -45,6 +47,7 @@ namespace ImgMoveResizeAndPixelCoordsApp1
             if (e.Button == MouseButtons.Left)
             {
                 mPos = e.Location;
+                ClickTestBeginPos = e.Location;
                 dx = e.X - imgX;
                 dy = e.Y - imgY;
                 MoveFlag = true;
@@ -87,75 +90,85 @@ namespace ImgMoveResizeAndPixelCoordsApp1
 
         private void Form1_Resize(object sender, EventArgs e)
         {
-            //pic.Bounds = ClientRectangle;
-
-
-            //TestImgPos(Axes.both);
-            //ShowPic();
+            pic.Left = lstAllEq.Width;
+            pic.Top = 0;
+            pic.Width = ClientRectangle.Width - lstAllEq.Width;
+            pic.Height = ClientRectangle.Height;
         }
 
-        private void ShowPic(bool ShowPos = false)
+        private void ShowPic(bool MovePicFlag = false)
         {
+            Rectangle rect = new Rectangle();
+            bool ShowEQ = false;
+            if (CurEQ > -1)
+            {
+                if (EQList.Count > 0)
+                {
+                    rect = EQList[CurEQ].rect;
+
+                    // move fon tut
+                    if (MovePicFlag) MovePic(rect);
+                    // move fon tut
+
+
+                    rect.X += imgX;
+                    rect.Y += imgY;
+                    ShowEQ = true;
+                }
+            }
             g.Clear(Color.Transparent);
             g.DrawImage(res.KKZ_2_25p_work, imgX, imgY, res.KKZ_2_25p_work.Width, res.KKZ_2_25p_work.Height);
-
-            Rectangle r = new Rectangle();
-
-            if (EQList.Count > 0)
+            if (ShowEQ)
             {
-                button1.Text = DateTime.Now.ToString("HH:mm:ss");
-                foreach (Eq s in EQList)
-                {
-                    r = s.rect;
-                    r.X += imgX;
-                    r.Y += imgY;
-                    g.DrawRectangle(new Pen(Brushes.Orange, 3), r);
-                    g.DrawString(s.name, new Font("Arial", 8), Brushes.Black, r.Location);
-                }
-
-
-
+                g.DrawRectangle(new Pen(Brushes.Orange, 3), rect);
+                g.DrawString("" + EQList[CurEQ].id + ". " + EQList[CurEQ].name, new Font("Arial", 8, FontStyle.Bold), Brushes.Black, rect.Location);
             }
-            if (ShowPos) CalcPoint();
-
-
             pic.Image = bmp;
         }
 
-        private void CalcPoint()
+        private void MovePic(Rectangle rect)
         {
-            string s = "";
-            s += "Cursor X = " + mPos.X + "\r\n";
-            s += "Cursor Y = " + mPos.Y + "\r\n\r\n";
+            bool MoveFlag = false;
+            if (rect.X < (imgX * -1)) // move right
+                MoveFlag = true;
+            else if (rect.X > (imgX * -1) + pic.Width - rect.Width) // move left
+                MoveFlag = true;
 
-            s += "pic X = " + pPos.X + "\r\n";
-            s += "pic Y = " + pPos.Y + "\r\n\r\n";
-
-            Color c = Color.Red;
-            if (pPos.X >= 0 && pPos.X < res.KKZ_2_25p_work.Width && pPos.Y >= 0 && pPos.Y < res.KKZ_2_25p_work.Height)
+            if (rect.Y < (imgY * -1)) // move down
+                MoveFlag = true;
+            else if (rect.Y > (imgY * -1) + pic.Height - rect.Height) // move up
+                MoveFlag = true;
+            //===================================================================================
+            if (MoveFlag)
             {
-                c = Color.Green;
+                imgX = rect.X * -1 + ((pic.Width - rect.Width) / 2);
+                imgY = rect.Y * -1 + ((pic.Height - rect.Height) / 2);
             }
-
-            g.DrawString(s, new Font("Arial", 12, FontStyle.Bold), new SolidBrush(c), new Point(10, 10));
+            TestImgPos(Axes.both);
         }
 
         //#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=
-        int c = 0, AddEqEtap = 0;
-        string EQName = "";
+        int AddEqEtap = 0;
         Rectangle r = new Rectangle();
-        private void AddEQBegin()
-        {
-            c++;
-            EQName = "New Eq #" + c;
-            AddEqEtap = 1;
-        }
         string EqListFn = Application.StartupPath + "\\EQList.txt";
         private void AddEQEnd()
         {
-            try { System.IO.File.AppendAllLines(EqListFn, new string[] { "" + c + ";" + EQName + ";" + r.X + ";" + r.Y + ";" + r.Width + ";" + r.Height }); }
-            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
-            Console.Beep(1000, 200);
+            FormEqName frm = new FormEqName();
+            DialogResult dr = frm.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+
+
+
+
+
+                try { System.IO.File.AppendAllLines(EqListFn, new string[] { "" + frm.NewNum + ";" + frm.NewName + ";" + r.X + ";" + r.Y + ";" + r.Width + ";" + r.Height }); }
+                catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+                Console.Beep(1000, 200);
+                ReLoadEqList();
+                CurEQ = -1;
+                ShowPic();
+            }
         }
         //#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
         class Eq
@@ -174,26 +187,44 @@ namespace ImgMoveResizeAndPixelCoordsApp1
         List<string> AllLines = new List<string>();
         List<Eq> EQList = new List<Eq>();
         List<string> tmp = new List<string>();
-        private void LoadEqList()
+        private void ReLoadEqList()
         {
+            AllLines.Clear();
+            EQList.Clear();
+            tmp.Clear();
+
+            lstAllEq.Items.Clear();
             AllLines = System.IO.File.ReadAllLines(EqListFn).ToList();
             foreach (string s in AllLines)
             {
-                textBox1.Text += s + "\r\n";
                 tmp = s.Split(';').ToList();
                 EQList.Add(new Eq(int.Parse(tmp[0]), tmp[1], new Rectangle(int.Parse(tmp[2]), int.Parse(tmp[3]), int.Parse(tmp[4]), int.Parse(tmp[5]))));
+                lstAllEq.Items.Add("" + tmp[0] + ". " + tmp[1]);
                 tmp.Clear();
-            }
-
-            textBox1.Text += "\r\n";
-            foreach (Eq eq in EQList)
-            {
-                textBox1.Text += eq.name + "   X = " + eq.rect.X + "   Y = " + eq.rect.Y + "   W = " + eq.rect.Width + "   H = " + eq.rect.Height + "\r\n";
             }
         }
 
 
         //#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=
+
+
+        private bool IsClick(Point MouseXY)
+        {
+            int x1 = MouseXY.X;
+            int y1 = MouseXY.Y;
+            int x2 = ClickTestBeginPos.X;
+            int y2 = ClickTestBeginPos.Y;
+            bool fx = false, fy = false;
+            //
+            if (x1 == x2 && y1 == y2) return true;
+            //
+            if (x1 > x2) { if (x1 - x2 < 5) fx = true; } else { if (x2 - x1 < 5) fx = true; }
+            //
+            if (y1 > y2) { if (y1 - y2 < 5) fy = true; } else { if (y2 - y1 < 5) fy = true; }
+            //
+            if (fx && fy) return true; else return false;
+        }
+
 
         private void pic_Click(object sender, EventArgs e)
         {
@@ -205,20 +236,32 @@ namespace ImgMoveResizeAndPixelCoordsApp1
                 r.X = pPos.X;
                 r.Y = pPos.Y;
                 AddEqEtap = 2;
+                Console.Beep(1000, 200);
             }
             else if (AddEqEtap == 2)
             {
                 r.Width = pPos.X - r.X;
                 r.Height = pPos.Y - r.Y;
                 AddEqEtap = 0;
+                Console.Beep(1000, 200);
                 AddEQEnd();
             }
-            ShowPic(true);
-        }
-
-        private void Form1_ResizeEnd(object sender, EventArgs e)
-        {
-
+            //
+            if (IsClick(mPos))
+            {
+                CurEQ = -1;
+                for (int i = 0; i < EQList.Count; i++)
+                {
+                    if (pPos.X > EQList[i].rect.X && pPos.X < EQList[i].rect.X + EQList[i].rect.Width && pPos.Y > EQList[i].rect.Y && pPos.Y < EQList[i].rect.Y + EQList[i].rect.Height)
+                    {
+                        CurEQ = i;
+                        break;
+                    }
+                }
+            }
+            //
+            lstAllEq.SelectedIndex = CurEQ;
+            //ShowPic();
         }
 
         private void tmrPaint_Tick(object sender, EventArgs e)
@@ -253,9 +296,27 @@ namespace ImgMoveResizeAndPixelCoordsApp1
 
         }
 
+        private void lstAllEq_MouseUp(object sender, MouseEventArgs e)
+        {
+            lstAllEq.SelectedIndex = lstAllEq.IndexFromPoint(e.Location);
+        }
+
+        private void lstAllEq_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CurEQ = lstAllEq.SelectedIndex;
+
+
+
+
+
+
+            ShowPic(true);
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            AddEQBegin();
+            AddEqEtap = 1;
+
         }
     }
 }

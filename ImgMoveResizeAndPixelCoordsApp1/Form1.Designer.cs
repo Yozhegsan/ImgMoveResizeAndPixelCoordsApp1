@@ -33,16 +33,17 @@ namespace ImgMoveResizeAndPixelCoordsApp1
             this.pic = new System.Windows.Forms.PictureBox();
             this.tmrPaint = new System.Windows.Forms.Timer(this.components);
             this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.lstAllEq = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.pic)).BeginInit();
             this.SuspendLayout();
             // 
             // pic
             // 
-            this.pic.BackColor = System.Drawing.Color.Blue;
-            this.pic.Location = new System.Drawing.Point(23, 230);
+            this.pic.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.pic.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pic.Location = new System.Drawing.Point(258, 0);
             this.pic.Name = "pic";
-            this.pic.Size = new System.Drawing.Size(1405, 466);
+            this.pic.Size = new System.Drawing.Size(1182, 684);
             this.pic.TabIndex = 0;
             this.pic.TabStop = false;
             this.pic.Click += new System.EventHandler(this.pic_Click);
@@ -58,39 +59,38 @@ namespace ImgMoveResizeAndPixelCoordsApp1
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(23, 12);
+            this.button1.Location = new System.Drawing.Point(12, 491);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(122, 90);
+            this.button1.Size = new System.Drawing.Size(94, 41);
             this.button1.TabIndex = 1;
-            this.button1.Text = "Add";
+            this.button1.Text = "Додати обладнання";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // textBox1
+            // lstAllEq
             // 
-            this.textBox1.Location = new System.Drawing.Point(151, 12);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(840, 199);
-            this.textBox1.TabIndex = 2;
+            this.lstAllEq.FormattingEnabled = true;
+            this.lstAllEq.Location = new System.Drawing.Point(0, 0);
+            this.lstAllEq.Name = "lstAllEq";
+            this.lstAllEq.Size = new System.Drawing.Size(252, 485);
+            this.lstAllEq.TabIndex = 3;
+            this.lstAllEq.SelectedIndexChanged += new System.EventHandler(this.lstAllEq_SelectedIndexChanged);
+            this.lstAllEq.MouseUp += new System.Windows.Forms.MouseEventHandler(this.lstAllEq_MouseUp);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1464, 729);
-            this.Controls.Add(this.textBox1);
+            this.ClientSize = new System.Drawing.Size(1464, 708);
+            this.Controls.Add(this.lstAllEq);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.pic);
             this.Name = "Form1";
             this.Text = "Img Move Resize And Pixel Coords";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.ResizeEnd += new System.EventHandler(this.Form1_ResizeEnd);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.pic)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -99,7 +99,7 @@ namespace ImgMoveResizeAndPixelCoordsApp1
         private System.Windows.Forms.PictureBox pic;
         private System.Windows.Forms.Timer tmrPaint;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.ListBox lstAllEq;
     }
 }
 
